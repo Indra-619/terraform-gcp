@@ -1,30 +1,38 @@
-# Contributing Guide
+# 🤝 Contributing Guide
 
-Thank you for contributing to this project! Please follow these guidelines to ensure consistency and quality.
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)
 
-## Code Standards
+Thank you for your interest in contributing! We love seeing the community get involved.
 
-- **Formatting**: All Terraform files must be formatted using `terraform fmt`.
+## 📐 Code Standards
+
+*   **Formatter**: We use `terraform fmt` to keep code clean.
     ```bash
     cd infrastructure
     terraform fmt -recursive
     ```
-- **Naming Conventions**: Use `snake_case` for all resource names and variables.
-- **Descriptions**: All variables and outputs must have a `description` field.
-- **Version Pinning**: Providers should have version constraints in `provider.tf`.
+*   **Naming**: Use `snake_case` for all resources.
+*   **Variables**: Always include a `description`.
 
-## Development Workflow
+## 🔄 Workflow
 
-1.  **Branching**: Create a new branch for each feature or fix.
+1.  **Fork** the repository.
+2.  **Clone** your fork locally.
+3.  **Branch** out for your feature:
     ```bash
-    git checkout -b feature/my-new-feature
+    git checkout -b feature/amazing-feature
     ```
-2.  **Commit Messages**: Write clear, descriptive commit messages.
-3.  **Pull Requests**: detailed description of changes and verification steps.
+4.  **Commit** your changes with clear messages.
+5.  **Push** to your fork and submit a **Pull Request**.
 
-## Tools
+## 🛠️ Recommended Tools
 
-Recommended tools for local development:
-- **TFLint**: A Pluggable Terraform Linter.
-- **tfsec**: Static analysis security scanner.
-- **VS Code Terraform Extension**: For syntax highlighting and autocomplete.
+| Tool | Description |
+| :--- | :--- |
+| **TFLint** | Find possible errors and best practices. |
+| **tfsec** | Security scanner for your infrastructure. |
+| **VS Code** | With the official Terraform extension. |
+
+---
+
+<p align="center">Happy Coding! 🚀</p>

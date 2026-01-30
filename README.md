@@ -1,44 +1,66 @@
-# GCP Terraform Setup
+# ☁️ Modular Terraform GCP Setup
 
-This repository contains a Terraform configuration for deploying a scalable and cost-effective web server infrastructure on Google Cloud Platform (GCP).
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
+![Google Cloud](https://img.shields.io/badge/GoogleCloud-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
+[![Built By](https://img.shields.io/badge/Built%20by-Indra--619-orange?style=for-the-badge&logo=github)](https://github.com/Indra-619)
 
-## Infrastructure Overview
+> **Deploy scalable, cost-effective web infrastructure with ease.**  
+> A modular Terraform configuration for Google Cloud Platform, featuring specific network security, auto-healing, and load balancing.
 
-- **Compute**: Managed Instance Group (MIG) using preemptible Linux (Ubuntu) VMs.
-- **Networking**: Custom VPC with private subnets and specific firewall rules.
-- **Load Balancing**: External Global HTTP Load Balancer.
-- **Structure**: Modular architecture (`infrastructure/modules/`).
+---
 
-## Documentation
+## 📂 Project Structure
 
-- [Contributing Guide](docs/CONTRIBUTING.md)
-- [Testing & Verification](docs/TESTING.md)
+```bash
+terraform-gcp/
+├── 📄 README.md              # You are here!
+├── 📂 docs/                  # Detailed documentation
+│   ├── 🤝 CONTRIBUTING.md    # Guide for contributors
+│   └── 🧪 TESTING.md         # Verification procedures
+└── 📂 infrastructure/        # Terraform code
+    ├── 🧱 main.tf            # Root configuration
+    └── 📦 modules/           # Reusable components
+        ├── 🌐 network/       # VPC, Subnets, Firewall
+        ├── 💻 compute/       # MIG, Templates, Auto-healing
+        └── ⚖️ lb/            # Global HTTP Load Balancer
+```
 
-## Prerequisites
+---
 
-1.  **Terraform**: Install Terraform (v1.0+).
-2.  **Google Cloud SDK**: Install and authenticate `gcloud`.
-3.  **GCP Project**: A valid GCP project.
+## 🚀 Quick Start
 
-## Quick Start
+### Prerequisites
+- [x] **Terraform** (v1.0+)
+- [x] **Google Cloud SDK** (`gcloud`)
+- [x] **GCP Project** with billing enabled
 
-1.  **Authenticate**:
-    ```bash
-    gcloud auth application-default login
-    ```
+### 1️⃣ Authenticate
+```bash
+gcloud auth application-default login
+```
 
-2.  **Navigate to Infrastructure**:
-    ```bash
-    cd infrastructure
-    ```
+### 2️⃣ Navigate & Initialize
+```bash
+cd infrastructure
+terraform init
+```
 
-3.  **Initialize**:
-    ```bash
-    terraform init
-    ```
+### 3️⃣ Plan & Apply
+```bash
+terraform plan
+terraform apply
+```
 
-4.  **Plan & Apply**:
-    ```bash
-    terraform plan
-    terraform apply
-    ```
+---
+
+## 📚 Documentation links
+
+- **[🤝 Contributing Guide](docs/CONTRIBUTING.md)**: Learn how to contribute to this project.
+- **[🧪 Testing & Verification](docs/TESTING.md)**: How to verify your deployment.
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/Indra-619">Indra-619</a>
+</p>

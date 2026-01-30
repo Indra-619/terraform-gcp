@@ -1,51 +1,44 @@
-# Testing & Verification Plan
+# 🧪 Testing & Verification Plan
 
-Follow these steps to verify the infrastructure deployment.
+Ensure your infrastructure works exactly as expected.
 
-## 1. Automated Validation
+## 🤖 1. Automated Validation
 
-Run the following commands to ensure configuration validity:
+Before applying, run these standard Terraform checks:
 
 ```bash
 cd infrastructure
 
-# Check syntax and internal consistency
+# 1. Check syntax and internal consistency
 terraform validate
 
-# Verify the execution plan matches expectations
+# 2. Preview changes
 terraform plan
 ```
 
-## 2. Manual Verification (Post-Deployment)
+## 🔍 2. Manual Verification
 
 After running `terraform apply`, verify the resources in the GCP Console:
 
-### Networking
-1.  Go to **VPC network** > **VPC networks**.
-2.  Verify `main-vpc` exists with subnet `main-subnet`.
-3.  Check **Firewall** rules: ensure `allow-ssh`, `allow-http`, and `allow-internal` are present and targeting `web-server` tags where appropriate.
+### 🌐 Networking
+- [ ] **VPC**: `main-vpc` exists.
+- [ ] **Subnet**: `main-subnet` is created.
+- [ ] **Firewall**: Rules `allow-ssh`, `allow-http`, `allow-internal` are active.
 
-### Compute Engine
-1.  Go to **Compute Engine** > **Instance groups**.
-2.  Click on `web-server-mig`.
-3.  Verify the number of instances matches `instance_count`.
-4.  Check that instances are **Healthy**.
+### 💻 Compute
+- [ ] **MIG**: `web-server-mig` is running `instance_count` VMs.
+- [ ] **Health**: All instances report as **Healthy**.
 
-### Load Balancing
-1.  Go to **Network services** > **Load balancing**.
-2.  Find the Load Balancer (created by the forwarding rule).
+### ⚖️ Load Balancing
+1.  Go to **Network services > Load balancing**.
+2.  Find the LB created by `global-rule`.
 3.  Copy the **Frontend IP**.
-4.  Open the IP in a browser: `http://<load_balancer_ip>`.
-    - You should see the "Hello from Terraform Managed Instance Group!" page.
+4.  Visit `http://<load_balancer_ip>` in your browser.
+    > You should see: *"Hello from Terraform Managed Instance Group!"*
 
-## 3. Connectivity Tests
-
-Test access from your local machine:
+## 🔌 3. Connectivity Tests
 
 ```bash
-# Test Load Balancer response
-curl http://<load_balancer_ip>
-
-# (Optional) Test SSH to a specific instance via public IP (if key added)
-ssh user@<instance_public_ip>
+# Test LB Response
+curl -I http://<load_balancer_ip>
 ```

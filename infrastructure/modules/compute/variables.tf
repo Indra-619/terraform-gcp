@@ -1,3 +1,18 @@
+variable "company_name" {
+  description = "The name of the company"
+  type        = string
+}
+
+variable "environment" {
+  description = "The environment (dev, staging, production)"
+  type        = string
+}
+
+variable "service_name" {
+  description = "The name of the service"
+  type        = string
+}
+
 variable "machine_type" {
   description = "The machine type for the instances"
   type        = string
@@ -26,4 +41,9 @@ variable "subnet_id" {
 variable "instance_count" {
   description = "Number of instances in the MIG"
   type        = number
+}
+
+variable "labels" {
+  description = "Common labels to apply to resources"
+  type        = map(string)
 }

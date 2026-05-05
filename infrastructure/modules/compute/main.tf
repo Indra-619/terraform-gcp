@@ -1,5 +1,9 @@
+locals {
+  name_prefix = "${var.company_name}-${var.environment}-${var.service_name}"
+}
+
 resource "google_compute_instance_template" "default" {
-  name_prefix  = "web-server-template-"
+  name_prefix  = "${local.name_prefix}-template-"
   machine_type = var.machine_type
   region       = var.region
 
@@ -12,25 +16,21 @@ resource "google_compute_instance_template" "default" {
   network_interface {
     network    = var.network_id
     subnetwork = var.subnet_id
-    access_config {
-      // Ephemeral public IP
-    }
+    # Principal Architect Standard: No public IP in production
+    # access_config {} 
   }
 
-  // Preemptible VMs for best price
+  # Preemptible VMs for best price (Dev environment standard)
   scheduling {
-    preemptible       = true
-    automatic_restart = false
+    preemptible       = var.environment == "production" ? false : true
+    automatic_restart = var.environment == "production" ? true : false
   }
 
-  tags = ["web-server"]
+  tags = ["web-server", "allow-ssh"]
 
-  metadata_startup_script = <<-EOT
-    #!/bin/bash
-    apt-get update
-    apt-get install -y nginx
-    echo "Hello from Terraform Managed Instance Group! Hostname: $(hostname)" > /var/www/html/index.html
-  EOT
+  metadata_startup_script = file("${path.module}/startup.sh")
+
+  labels = var.labels
 
   lifecycle {
     create_before_destroy = true
@@ -38,9 +38,9 @@ resource "google_compute_instance_template" "default" {
 }
 
 resource "google_compute_instance_group_manager" "default" {
-  name = "web-server-mig"
+  name = "${local.name_prefix}-mig"
 
-  base_instance_name = "web-server"
+  base_instance_name = var.service_name
   zone               = var.zone
 
   version {
@@ -61,7 +61,7 @@ resource "google_compute_instance_group_manager" "default" {
 }
 
 resource "google_compute_health_check" "autohealing" {
-  name                = "autohealing-health-check"
+  name                = "${local.name_prefix}-hc-autohealing"
   check_interval_sec  = 5
   timeout_sec         = 5
   healthy_threshold   = 2

@@ -1,44 +1,55 @@
 # 🧪 Testing & Verification Plan
 
-Ensure your infrastructure works exactly as expected.
+Pastikan infrastruktur Anda berjalan sesuai standar keamanan dan fungsionalitas **Code Unified**.
 
-## 🤖 1. Automated Validation
+## 🤖 1. Validasi Pra-Deploy
 
-Before applying, run these standard Terraform checks:
+Sebelum menjalankan `apply`, lakukan pemeriksaan standar:
 
 ```bash
 cd infrastructure
 
-# 1. Check syntax and internal consistency
+# 1. Cek sintaks dan konsistensi internal
 terraform validate
 
-# 2. Preview changes
-terraform plan
+# 2. Preview perubahan dan simpan plan
+terraform plan -out=tfplan
 ```
 
-## 🔍 2. Manual Verification
+## 🔍 2. Verifikasi Pasca-Deploy (Audit Manual)
 
-After running `terraform apply`, verify the resources in the GCP Console:
+Setelah menjalankan `terraform apply`, verifikasi resource di GCP Console menggunakan naming convention yang baru:
 
 ### 🌐 Networking
-- [ ] **VPC**: `main-vpc` exists.
-- [ ] **Subnet**: `main-subnet` is created.
-- [ ] **Firewall**: Rules `allow-ssh`, `allow-http`, `allow-internal` are active.
+- [ ] **VPC**: Nama mengikuti format `indra-{env}-web-server-vpc`.
+- [ ] **Subnet**: Memiliki fitur **Private Google Access** diaktifkan.
+- [ ] **Firewall**: 
+    - Aturan `allow-ssh-iap` hanya mengizinkan range `35.235.240.0/20`.
+    - Aturan `allow-http` aktif untuk port 80.
+    - Tidak ada port 22 yang terbuka ke `0.0.0.0/0`.
 
-### 💻 Compute
-- [ ] **MIG**: `web-server-mig` is running `instance_count` VMs.
-- [ ] **Health**: All instances report as **Healthy**.
+### 💻 Compute (MIG)
+- [ ] **MIG**: Berjalan dengan nama `{company}-{env}-{service}-mig`.
+- [ ] **Health**: Semua instance dalam grup berstatus **Healthy**.
+- [ ] **No Public IP**: Cek di console, instance TIDAK boleh memiliki External IP.
 
 ### ⚖️ Load Balancing
-1.  Go to **Network services > Load balancing**.
-2.  Find the LB created by `global-rule`.
-3.  Copy the **Frontend IP**.
-4.  Visit `http://<load_balancer_ip>` in your browser.
-    > You should see: *"Hello from Terraform Managed Instance Group!"*
+1.  Buka **Network services > Load balancing**.
+2.  Cek frontend IP pada Load Balancer `{company}-{env}-{service}-lb-url-map`.
+3.  Akses `http://<load_balancer_ip>` di browser.
+    > Output: *"Hello from Terraform Managed Instance Group!"*
 
-## 🔌 3. Connectivity Tests
+## 🔌 3. Tes Konektivitas SSH (via IAP)
+
+Karena port 22 ditutup dari publik, gunakan `gcloud` untuk masuk ke instance melalui tunnel IAP:
 
 ```bash
-# Test LB Response
-curl -I http://<load_balancer_ip>
+# Ganti <instance_name> dengan nama VM dari MIG
+gcloud compute ssh <instance_name> --tunnel-through-iap --project=<your_project_id> --zone=<your_zone>
 ```
+
+## 📦 4. Verifikasi State
+- [ ] Cek bucket GCS Anda. Pastikan file `default.tfstate` (atau sesuai prefix) sudah terbuat dan terupdate.
+
+---
+<p align="center">Verifikasi Selesai — Infrastruktur Aman & Standar 🛡️</p>

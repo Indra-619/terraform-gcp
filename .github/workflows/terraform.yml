@@ -43,7 +43,9 @@ jobs:
       - name: TFLint
         uses: terraform-linters/setup-tflint@v4
         with:
-          version: 0.54.0
+          # Pin to 0.50.3 — tflint-ruleset-google v0.39.0 requires TFLint API v10,
+          # but 0.51+ uses API v11 (incompatible plugin binary)
+          version: 0.50.3
 
       - name: TFLint init
         run: tflint --init --config .tflint.hcl
@@ -64,7 +66,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # scan-type: config + scanners: misconfig = IaC misconfiguration scan
       - name: Trivy IaC Scan
         uses: aquasecurity/trivy-action@master
         with:
@@ -97,8 +98,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # GCP Authentication via Workload Identity Federation (recommended)
-      # Setup: https://github.com/google-github-actions/auth#workload-identity-federation
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v2
         with:

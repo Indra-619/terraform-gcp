@@ -17,3 +17,8 @@ variable "instance_group" {
   description = "The instance group for the load balancer"
   type        = string
 }
+
+variable "project_id" {
+  description = "The GCP Project ID (required for SSL certificate domain validation)"
+  type        = string
+}

@@ -36,4 +36,5 @@ module "lb" {
   environment    = var.environment
   service_name   = var.service_name
   instance_group = module.compute.instance_group
+  project_id     = var.project_id
 }

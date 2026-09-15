@@ -40,11 +40,17 @@ jobs:
         run: terraform validate
         working-directory: infrastructure
 
+      - name: Download TFLint
+        run: |
+          curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v0.50.3/tflint_linux_amd64.zip" -o /tmp/tflint.zip
+          unzip -oq /tmp/tflint.zip -d /tmp
+          chmod +x /tmp/tflint
+
       - name: TFLint init
-        run: tflint --init --config .tflint.hcl
+        run: /tmp/tflint --init --config .tflint.hcl
 
       - name: Run TFLint
-        run: tflint --config .tflint.hcl
+        run: /tmp/tflint --config .tflint.hcl
 
   # -----------------------------------------
   # Job 2: Security scan (no deploy, read-only)

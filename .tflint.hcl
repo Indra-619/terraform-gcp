@@ -1,26 +1,29 @@
 # ============================================================
-# .tflint.hcl — TFLint configuration for GCP
+# .tflint.hcl — TFLint configuration for GCP Terraform
 # https://github.com/terraform-linters/tflint
-# Install: brew install tflint
-# Run:     tflint
-# CI:      tflint --init && tflint
+#
+# NOTE: tflint-ruleset-google plugin is incompatible with the runner's
+# pre-installed TFLint version (API v11 mismatch). Using only built-in
+# core rules — GCP-specific checks should be done via Trivy in the CI.
 # ============================================================
 
 config {
   force = false
 }
 
+# Disable plugin auto-update (no google plugin loaded)
 plugin "google" {
-  enabled = true
-  version = "0.16.0"
-  source  = "github.com/terraform-linters/tflint-ruleset-google"
+  enabled = false
 }
 
-# ------------------------------------------
-# Core rules (proven stable with tflint 0.54.0 + google plugin 0.16.0)
-# ------------------------------------------
+# -----------------------------------------
+# Built-in rules enabled
+# -----------------------------------------
 
-rule "google_instance_invalid_type"        { enabled = true }
-rule "terraform_documented_outputs"         { enabled = true }
-rule "terraform_documented_variables"     { enabled = true }
-rule "terraform_naming_convention"        { enabled = true }
+rule "terraform_deprecated_interpolation" { enabled = true }
+rule "terraform_documented_outputs"     { enabled = true }
+rule "terraform_documented_variables"    { enabled = true }
+rule "terraform_naming_convention"       { enabled = true }
+rule "terraform_required_version"       { enabled = true }
+rule "terraform_required_providers"      { enabled = true }
+rule "terraform_unused_declarations"    { enabled = true }

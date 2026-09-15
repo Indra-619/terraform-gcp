@@ -2,9 +2,11 @@
 *.tfstate
 *.tfstate.*
 *.tfvars
-!example.tfvars
+!infrastructure/terraform.tfvars.example
 .terraform/
 .terraform.lock.hcl
+infrastructure/terraform.tfstate
+infrastructure/terraform.tfstate.*
 
 # IDE
 .idea/
@@ -19,6 +21,6 @@ Thumbs.db
 # Logs
 *.log
 
-# Local overrides (keep real secrets out of repo)
+# Local overrides
 override.tf
 override.tfvars

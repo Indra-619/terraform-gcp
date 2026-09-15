@@ -1,0 +1,158 @@
+name: Terraform CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: terraform-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -----------------------------------------
+  # Job 1: fmt + validate (no GCP creds needed)
+  # -----------------------------------------
+  quality:
+    name: Format & Validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.0
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -recursive -check
+
+      - name: Terraform init
+        run: terraform init -upgrade -backend=false
+        working-directory: infrastructure
+
+      - name: Terraform validate
+        run: terraform validate
+        working-directory: infrastructure
+
+      - name: TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          version: 0.54.0
+
+      - name: TFLint init
+        run: tflint --init --config .tflint.hcl
+
+      - name: Run TFLint
+        run: tflint --config .tflint.hcl
+
+  # -----------------------------------------
+  # Job 2: Security scan (no deploy, read-only)
+  # -----------------------------------------
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # scan-type: config + scanners: misconfig = IaC misconfiguration scan
+      - name: Trivy IaC Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scanners: 'misconfig'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          skip-dirs: '.git,modules,docs'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # -----------------------------------------
+  # Job 3: Plan (requires GCP — only on PR)
+  # -----------------------------------------
+  plan:
+    name: Terraform Plan
+    runs-on: ubuntu-latest
+    needs: [quality, security]
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # GCP Authentication via Workload Identity Federation (recommended)
+      # Setup: https://github.com/google-github-actions/auth#workload-identity-federation
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.0
+
+      - name: Terraform init
+        run: terraform init -upgrade
+        working-directory: infrastructure
+
+      - name: Terraform plan
+        run: |
+          terraform plan \
+            -var="project_id=${{ vars.GCP_PROJECT_ID }}" \
+            -var="environment=pr-${{ github.event.number }}" \
+            -out=tfplan
+        working-directory: infrastructure
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp-creds.json
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: infrastructure/tfplan
+          retention-days: 3
+
+  # -----------------------------------------
+  # Job 4: Secrets scan
+  # -----------------------------------------
+  secrets:
+    name: Secrets Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect-secrets scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          flags: --only-verified
+        continue-on-error: true

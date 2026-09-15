@@ -1,0 +1,21 @@
+# ============================================================
+# terraform-gcp — Variable Overrides
+# ============================================================
+# COPY this file to infrastructure/terraform.tfvars
+# then edit the values to match your environment.
+# ============================================================
+
+# --- Required (no defaults) ---
+
+project_id   = "your-gcp-project-id"
+environment  = "dev"
+service_name = "web-server"
+
+# --- Optional (have defaults) ---
+
+aws_region       = "asia-southeast2"  # GCP region (Jakarta)
+zone             = "asia-southeast2-a" # GCP zone
+machine_type     = "e2-medium"
+instance_count   = 2
+company_name     = "indra"
+# create_vpc      = true               # Coming soon: optional VPC module

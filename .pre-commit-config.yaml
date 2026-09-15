@@ -1,0 +1,40 @@
+# ============================================================
+# .pre-commit-config.yaml
+# https://pre-commit.com
+# Install:  pip install pre-commit && pre-commit install
+# Run:      pre-commit run -a
+# CI:       pre-commit run -a (in CI pipeline)
+# ============================================================
+
+repos:
+  # Terraform formatting + validation
+  - repo: https://github.com/hashicorp/terraform-pre-commit-hook
+    rev: v1.1.2
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+
+  # TFLint for GCP
+  - repo: local
+    hooks:
+      - id: tflint
+        name: TFLint (GCP)
+        entry: tflint --config .tflint.hcl
+        language: system
+        pass_filenames: false
+        types: [terraform]
+
+  # Detect hardcoded secrets
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+
+  # Prevent large files
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-merge-conflict
+      - id: trailing-whitespace
+      - id: end-of-file-fixer

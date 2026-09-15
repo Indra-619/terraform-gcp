@@ -2,18 +2,13 @@
 # .tflint.hcl — TFLint configuration for GCP Terraform
 # https://github.com/terraform-linters/tflint
 #
-# NOTE: tflint-ruleset-google plugin is incompatible with the runner's
-# pre-installed TFLint version (API v11 mismatch). Using only built-in
-# core rules — GCP-specific checks should be done via Trivy in the CI.
+# NOTE: tflint-ruleset-google plugin incompatible with runner's TFLint (API v11).
+# GCP-specific security checks covered by Trivy IaC scan in CI security job.
+# This config uses only built-in core rules.
 # ============================================================
 
 config {
   force = false
-}
-
-# Disable plugin auto-update (no google plugin loaded)
-plugin "google" {
-  enabled = false
 }
 
 # -----------------------------------------
